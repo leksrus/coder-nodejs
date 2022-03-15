@@ -5,127 +5,110 @@ class Container {
     this.fileName = fileName;
   }
 
-  save(object) {
-    let arrayData = [];
-    exists(this.fileName).then((isExist) => {
-      if (isExist) {
-        readFile(this.fileName).then((fileData) => {
-          arrayData = JSON.parse(fileData);
-          const ids = arrayData.map((object) => object.id);
-          const max = Math.max(...ids);
-          object.id = max + 1;
-          arrayData.push(object);
-          const data = JSON.stringify(arrayData);
-          writeFile(this.fileName, data);
-        });
-      } else {
+ async save(object) {
+    try {
+
+      const isExist = fs.existsSync(this.fileName);
+      let arrayData = [];
+
+      if(isExist){
+        const data = await fs.promises.readFile(this.fileName, "utf8");
+        arrayData = JSON.parse(data);
+        const ids = arrayData.map((object) => object.id);
+        const max = Math.max(...ids);
+        object.id = max + 1;
+        arrayData.push(object);
+        const content = JSON.stringify(arrayData);
+        await fs.promises.writeFile(this.fileName, content);
+      }
+      else{
         object.id = 1;
         arrayData.push(object);
-        const data = JSON.stringify(arrayData);
-        writeFile(this.fileName, data);
+        const content = JSON.stringify(arrayData);
+        await fs.promises.writeFile(this.fileName, content);
       }
-    });
+      
+    } catch (error) {
+      console.log(error);
+    }
   }
 
-  getById(id) {
-    exists(this.fileName).then((isExist) => {
-      if (isExist) {
-        readFile(this.fileName).then((fileData) => {
-          const arrayData = JSON.parse(fileData);
-          const product = arrayData.find((x) => parseInt(x.id) === parseInt(id));
-          console.log(product);
-          if (product) return product;
+  async getById(id) {
+    try {
+      const data = await fs.promises.readFile(this.fileName, "utf8");
 
-          return null;
-        });
+      if(data){
+        const arrayData = JSON.parse(data);
+        const product = arrayData.find((x) => parseInt(x.id) === parseInt(id));
+
+        if (product) return product;
+
+        return null;
       }
 
       return null;
-    });
+      
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async getAll() {
-    const isExists = await exists(this.fileName);
+    try {
+      const data = await fs.promises.readFile(this.fileName, "utf8");
 
-    if (isExists) {
-      const data = await readFile(this.fileName);
+      if (data) return JSON.parse(data);
 
-      return JSON.parse(data);
+      return null;
+      
+    } catch (error) {
+      console.log(error);
     }
-
-    return null;
   }
 
-  deletById(id) {
-    exists(this.fileName).then((isExist) => {
-      if (isExist) {
-        readFile(this.fileName).then((fileData) => {
-          const arrayData = JSON.parse(fileData);
-          const filteredArray = arrayData.filter((x) => x.id !== id);
-          const data = JSON.stringify(filteredArray);
-          writeFile(this.fileName, data);
-        });
+  async deletById(id) {
+    try {
+      const data = await fs.promises.readFile(this.fileName, "utf8");
+
+      if(data){
+        const arrayData = JSON.parse(data);
+        const filteredArray = arrayData.filter((x) => x.id !== id);
+        const content = JSON.stringify(filteredArray);
+        await fs.promises.writeFile(this.fileName, content);
       }
-    });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
-  deleteAll() {
-    exists(this.fileName).then((isExist) => {
-      if (isExist) {
-        deleteFile(this.fileName);
-      }
-    });
-  }
-}
-
-async function readFile(fileName) {
-  try {
-    return await fs.promises.readFile(fileName, "utf8");
-  } catch (err) {
-    console.error(err);
+  async deleteAll() {
+    try {
+      await fs.promises.unlink(this.fileName);
+    } catch (error) {
+      console.log(error);
+    }
   }
 }
 
-async function writeFile(fileName, content) {
-  try {
-    await fs.promises.writeFile(fileName, content);
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-async function exists(fileName) {
-  try {
-    await fs.promises.access(fileName, fs.constants.F_OK);
-
-    return true;
-  } catch (err) {
-    console.error(err);
-
-    return false;
-  }
-}
-
-async function deleteFile(fileName) {
-  try {
-    await fs.promises.unlink(fileName);
-  } catch (error) {
-    console.error(err);
-  }
-}
 
 const container = new Container("products.txt");
 
 const product = { title: "soap", proce: 10.33, thumbnails: "/##/##" };
 
-// container.save(product);
+container.save(product).then(()=>{
+  container.save(product).then(()=>{
+    container.getById(2).then((data) => {
+      console.log(data);
+      container.getAll().then((data) => {
+        console.log(data);
+        container.deletById(1).then(() => {
+          container.getAll().then((data) => {
+            console.log(data);
+            container.deleteAll();
+          });
+        });
+      });
+    })
+  })
+});
 
-// console.log(container.getById(1));
-
-// console.log(container.getById(2));
-
-container.getAll().then((data) => console.log(data));
-
-// console.log(container.deletById(1));
-
-// container.deleteAll();
