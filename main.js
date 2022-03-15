@@ -5,13 +5,12 @@ class Container {
     this.fileName = fileName;
   }
 
- async save(object) {
+  async save(object) {
     try {
-
       const isExist = fs.existsSync(this.fileName);
       let arrayData = [];
 
-      if(isExist){
+      if (isExist) {
         const data = await fs.promises.readFile(this.fileName, "utf8");
         arrayData = JSON.parse(data);
         const ids = arrayData.map((object) => object.id);
@@ -20,14 +19,16 @@ class Container {
         arrayData.push(object);
         const content = JSON.stringify(arrayData);
         await fs.promises.writeFile(this.fileName, content);
+
+        return object.id;
       }
-      else{
-        object.id = 1;
-        arrayData.push(object);
-        const content = JSON.stringify(arrayData);
-        await fs.promises.writeFile(this.fileName, content);
-      }
-      
+
+      object.id = 1;
+      arrayData.push(object);
+      const content = JSON.stringify(arrayData);
+      await fs.promises.writeFile(this.fileName, content);
+
+      return 1;
     } catch (error) {
       console.log(error);
     }
@@ -37,7 +38,7 @@ class Container {
     try {
       const data = await fs.promises.readFile(this.fileName, "utf8");
 
-      if(data){
+      if (data) {
         const arrayData = JSON.parse(data);
         const product = arrayData.find((x) => parseInt(x.id) === parseInt(id));
 
@@ -47,7 +48,6 @@ class Container {
       }
 
       return null;
-      
     } catch (error) {
       console.log(error);
     }
@@ -59,8 +59,7 @@ class Container {
 
       if (data) return JSON.parse(data);
 
-      return null;
-      
+      return [];
     } catch (error) {
       console.log(error);
     }
@@ -70,7 +69,7 @@ class Container {
     try {
       const data = await fs.promises.readFile(this.fileName, "utf8");
 
-      if(data){
+      if (data) {
         const arrayData = JSON.parse(data);
         const filteredArray = arrayData.filter((x) => x.id !== id);
         const content = JSON.stringify(filteredArray);
@@ -90,13 +89,14 @@ class Container {
   }
 }
 
-
 const container = new Container("products.txt");
 
 const product = { title: "soap", proce: 10.33, thumbnails: "/##/##" };
 
-container.save(product).then(()=>{
-  container.save(product).then(()=>{
+container.save(product).then((id) => {
+  console.log(id);
+  container.save(product).then((id) => {
+    console.log(id);
     container.getById(2).then((data) => {
       console.log(data);
       container.getAll().then((data) => {
@@ -108,7 +108,6 @@ container.save(product).then(()=>{
           });
         });
       });
-    })
-  })
+    });
+  });
 });
-
