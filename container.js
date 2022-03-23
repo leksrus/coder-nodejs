@@ -89,25 +89,28 @@ class Container {
   }
 }
 
-const container = new Container("products.txt");
 
-const product = { title: "soap", proce: 10.33, thumbnails: "/##/##" };
+module.exports = Container;
 
-container.save(product).then((id) => {
-  console.log(id);
-  container.save(product).then((id) => {
-    console.log(id);
-    container.getById(2).then((data) => {
-      console.log(data);
-      container.getAll().then((data) => {
-        console.log(data);
-        container.deletById(1).then(() => {
-          container.getAll().then((data) => {
-            console.log(data);
-            container.deleteAll();
-          });
-        });
-      });
-    });
-  });
-});
+// const container = new Container("products.txt");
+
+// const product = { title: "soap", proce: 10.33, thumbnails: "/##/##" };
+
+// container.save(product).then((id) => {
+//   console.log(id);
+//   container.save(product).then((id) => {
+//     console.log(id);
+//     container.getById(2).then((data) => {
+//       console.log(data);
+//       container.getAll().then((data) => {
+//         console.log(data);
+//         container.deletById(1).then(() => {
+//           container.getAll().then((data) => {
+//             console.log(data);
+//             container.deleteAll();
+//           });
+//         });
+//       });
+//     });
+//   });
+// });
