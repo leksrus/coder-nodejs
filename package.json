@@ -4,7 +4,8 @@
   "description": "curso coder house",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
@@ -15,5 +16,10 @@
   "bugs": {
     "url": "https://github.com/leksrus/coder-nodejs/issues"
   },
-  "homepage": "https://github.com/leksrus/coder-nodejs#readme"
+  "homepage": "https://github.com/leksrus/coder-nodejs#readme",
+  "dependencies": {
+    "express": "^4.17.3",
+    "random": "^3.0.6",
+    "randome": "^0.0.3"
+  }
 }
