@@ -1,5 +1,6 @@
 import express from 'express';
-import Product from './classes/product.js'
+import Product from './classes/product.js';
+// import { engine } from 'express-handlebars';
 
 // const Container = require('./container');
 // const tempContainer = new Container("products.txt");
@@ -13,46 +14,46 @@ app.use('/api/products', routerProducts);
 app.use(express.static('public'))
 
 routerProducts.use(express.json());
-routerProducts.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({extended: true}));
+
+// app.engine(
+//   "hbs",
+//   engine({
+//       extname: ".hbs",
+//       defaultLayout: 'index.hbs',
+//   })
+// );
+
+app.set('views', './views');
+app.set('view engine', 'ejs');
+// app.set('view engine', 'hbs');
+// app.set('view engine', 'pug');
 
 const port = 8080;
 
 let products = [];
 
-// app.get('/generate', async (req, res) => {
-//   const product1 = { title: "soap", proce: 10.33, thumbnails: "/##/##" };
-//   const product2 = { title: "paper", proce: 58.99, thumbnails: "/##/##" };
-//   const product3 = { title: "milk", proce: 5.99, thumbnails: "/##/##" };
-//   const product4 = { title: "pensil", proce: 1.00, thumbnails: "/##/##" };
-//   const product5 = { title: "bread", proce: 1.50, thumbnails: "/##/##" };
-//
-//   try {
-//     await tempContainer.save(product1);
-//     await tempContainer.save(product2);
-//     await tempContainer.save(product3);
-//     await tempContainer.save(product4);
-//     await tempContainer.save(product5);
-//
-//     res.send('OK');
-//
-//   } catch (error) {
-//     res.send(error);
-//   }
-// })
-//
-//
-// app.get('/products', async (req, res) => {
-//   res.send(await tempContainer.getAll());
-// })
-//
-// app.get('/random-product', async (req, res) => {
-//   const number = random.int((min = 1), (max = 5));
-//
-//   const product = await tempContainer.getById(number);
-//
-//   res.send(product);
-// })
 
+//TEMPLATES
+app.get('/products', (req, res) => {
+  res.render("view", {
+    productsView: products,
+    productsViewExist: products.length
+});
+});
+
+app.post('/products', (req, res) => {
+  const id = getId();
+  console.log(req.body);
+  const product = new Product(id + 1, req.body.title, req.body.price, req.body.thumbnails);
+
+  products.push(product);
+  res.redirect('/')
+});
+
+
+
+//API REST
 routerProducts.get('/', async (req, res) => {
   if (products.length > 0) return res.json(products);
 

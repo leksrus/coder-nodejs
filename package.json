@@ -19,8 +19,10 @@
   },
   "homepage": "https://github.com/leksrus/coder-nodejs#readme",
   "dependencies": {
+    "ejs": "^3.1.6",
     "express": "^4.17.3",
-    "random": "^3.0.6",
-    "randome": "^0.0.3"
+    "express-handlebars": "^6.0.3",
+    "pug": "^3.0.2",
+    "random": "^3.0.6"
   }
 }
