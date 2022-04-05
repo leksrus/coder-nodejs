@@ -1,6 +1,6 @@
 import express from 'express';
 import Product from './classes/product.js';
-import { engine } from 'express-handlebars';
+// import { engine } from 'express-handlebars';
 
 // const Container = require('./container');
 // const tempContainer = new Container("products.txt");
@@ -16,18 +16,18 @@ app.use(express.static('public'))
 routerProducts.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
-app.engine(
-  "hbs",
-  engine({
-      extname: ".hbs",
-      defaultLayout: 'index.hbs',
-  })
-);
+// app.engine(
+//   "hbs",
+//   engine({
+//       extname: ".hbs",
+//       defaultLayout: 'index.hbs',
+//   })
+// );
 
 app.set('views', './views');
 // app.set('view engine', 'ejs');
-// app.set('view engine', 'ejs');
-app.set('view engine', 'hbs');
+// app.set('view engine', 'hbs');
+app.set('view engine', 'pug');
 
 const port = 8080;
 
