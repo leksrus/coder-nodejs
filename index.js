@@ -25,9 +25,9 @@ app.use(express.urlencoded({extended: true}));
 // );
 
 app.set('views', './views');
-// app.set('view engine', 'ejs');
+app.set('view engine', 'ejs');
 // app.set('view engine', 'hbs');
-app.set('view engine', 'pug');
+// app.set('view engine', 'pug');
 
 const port = 8080;
 
