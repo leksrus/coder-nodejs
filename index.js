@@ -4,7 +4,6 @@ import Product from './classes/product.js';
 
 // const Container = require('./container');
 // const tempContainer = new Container("products.txt");
-// const express = require('express');
 // const random = require('random');
 const app = express();
 const { Router } = express;
@@ -39,7 +38,7 @@ app.get('/products', (req, res) => {
   res.render("view", {
     productsView: products,
     productsViewExist: products.length
-});
+  });
 });
 
 app.post('/products', (req, res) => {
