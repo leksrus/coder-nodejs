@@ -20,7 +20,7 @@
   "homepage": "https://github.com/leksrus/coder-nodejs#readme",
   "dependencies": {
     "express": "^4.17.3",
-    "random": "^3.0.6",
-    "randome": "^0.0.3"
+    "express-handlebars": "^6.0.3",
+    "random": "^3.0.6"
   }
 }
