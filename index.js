@@ -1,6 +1,8 @@
 import express from 'express';
+import { createServer } from "http";
 import Product from './classes/product.js';
-// import { engine } from 'express-handlebars';
+import { Server } from 'socket.io';
+import { engine } from 'express-handlebars';
 
 // const Container = require('./container');
 // const tempContainer = new Container("products.txt");
@@ -8,6 +10,8 @@ import Product from './classes/product.js';
 const app = express();
 const { Router } = express;
 const routerProducts = Router();
+const httpServer = createServer(app);
+const io = new Server(httpServer);
 
 app.use('/api/products', routerProducts);
 app.use(express.static('public'))
@@ -15,22 +19,43 @@ app.use(express.static('public'))
 routerProducts.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
-// app.engine(
-//   "hbs",
-//   engine({
-//       extname: ".hbs",
-//       defaultLayout: 'index.hbs',
-//   })
-// );
+app.engine(
+  "hbs",
+  engine({
+      extname: ".hbs",
+      defaultLayout: 'index.hbs',
+  })
+);
 
 app.set('views', './views');
-app.set('view engine', 'ejs');
-// app.set('view engine', 'hbs');
+// app.set('view engine', 'ejs');
+app.set('view engine', 'hbs');
 // app.set('view engine', 'pug');
 
 const port = 8080;
 
 let products = [];
+let messages = [];
+
+
+//WEBSOCKET
+io.on('connection', function(socket) {
+  console.log('client conected');
+  socket.emit('products', products); 
+  socket.emit('messages', messages); 
+
+  socket.on('new-product', function(data) {
+    products.push(data);
+    io.sockets.emit('products', products); 
+  });    
+
+  socket.on('new-message', function(data) {
+    messages.push(data);
+    io.sockets.emit('messages', messages); 
+  }); 
+});
+
+
 
 
 //TEMPLATES
@@ -113,6 +138,6 @@ function getId() {
   return ids.length > 0 ? Math.max(...ids) : 0;
 }
 
-app.listen(port, () => {
+httpServer.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 })
