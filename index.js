@@ -1,10 +1,12 @@
 import express from 'express';
 import { createServer } from "http";
 import Product from './classes/product.js';
+import Message from "./classes/message.js";
+import Container from "./classes/container.js"
 import { Server } from 'socket.io';
 import { engine } from 'express-handlebars';
 
-// const Container = require('./container');
+
 // const tempContainer = new Container("products.txt");
 // const random = require('random');
 const app = express();
@@ -12,6 +14,7 @@ const { Router } = express;
 const routerProducts = Router();
 const httpServer = createServer(app);
 const io = new Server(httpServer);
+const container = new Container('messages.txt');
 
 app.use('/api/products', routerProducts);
 app.use(express.static('public'))
@@ -51,6 +54,7 @@ io.on('connection', function(socket) {
 
   socket.on('new-message', function(data) {
     messages.push(data);
+    container.save(new Message(data.email, data.dateTime, data.text))
     io.sockets.emit('messages', messages); 
   }); 
 });
@@ -60,10 +64,7 @@ io.on('connection', function(socket) {
 
 //TEMPLATES
 app.get('/products', (req, res) => {
-  res.render("view", {
-    productsView: products,
-    productsViewExist: products.length
-  });
+  res.render("view");
 });
 
 app.post('/products', (req, res) => {

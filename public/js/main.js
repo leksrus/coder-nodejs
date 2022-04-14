@@ -47,16 +47,19 @@ function addProduct() {
 function renderMessages(data) { 
     let html = data.map(function(elem, index){ 
       return(`<div>
-            <strong>${elem.email}</strong>: 
-            <em>${elem.message}</em> </div>`) 
+            <span class="text-primary"><strong>${elem.email}</strong></span>: 
+            <span class="text-muted">${elem.dateTime}</span>
+            <span class="text-success"><em>${elem.text}</em></span>
+            </div>`)
     }).join(" "); 
     document.getElementById('messages').innerHTML = html; 
 }
 
 function addMessage() { 
     let message = { 
-      email: document.getElementById('email').value, 
-      message: document.getElementById('message').value
+      email: document.getElementById('email').value,
+      dateTime: getDateStamp(),
+      text: document.getElementById('message').value
     }; 
     console.log(message);
     socket.emit('new-message', message); 
@@ -64,4 +67,9 @@ function addMessage() {
     document.getElementById('message').value = '';
 
     return;
+}
+
+function getDateStamp() {
+    let current_datetime = new Date()
+    return current_datetime.getDate() + "/" + (current_datetime.getMonth() + 1) + "/" +  current_datetime.getFullYear() + " " + current_datetime.getHours() + ":" + current_datetime.getMinutes() + ":" + current_datetime.getSeconds()
 }
