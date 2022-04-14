@@ -1,4 +1,5 @@
-const fs = require("fs");
+import  { readFile, writeFile, unlink } from 'fs/promises';
+import { existsSync } from 'fs';
 
 class Container {
   constructor(fileName) {
@@ -7,18 +8,18 @@ class Container {
 
   async save(object) {
     try {
-      const isExist = fs.existsSync(this.fileName);
+      const isExist = existsSync(this.fileName);
       let arrayData = [];
 
       if (isExist) {
-        const data = await fs.promises.readFile(this.fileName, "utf8");
+        const data = await readFile(this.fileName, "utf8");
         arrayData = JSON.parse(data);
         const ids = arrayData.map((object) => object.id);
         const max = Math.max(...ids);
         object.id = max + 1;
         arrayData.push(object);
         const content = JSON.stringify(arrayData);
-        await fs.promises.writeFile(this.fileName, content);
+        await writeFile(this.fileName, content);
 
         return object.id;
       }
@@ -26,7 +27,7 @@ class Container {
       object.id = 1;
       arrayData.push(object);
       const content = JSON.stringify(arrayData);
-      await fs.promises.writeFile(this.fileName, content);
+      await writeFile(this.fileName, content);
 
       return 1;
     } catch (error) {
@@ -36,7 +37,7 @@ class Container {
 
   async getById(id) {
     try {
-      const data = await fs.promises.readFile(this.fileName, "utf8");
+      const data = await readFile(this.fileName, "utf8");
 
       if (data) {
         const arrayData = JSON.parse(data);
@@ -55,7 +56,7 @@ class Container {
 
   async getAll() {
     try {
-      const data = await fs.promises.readFile(this.fileName, "utf8");
+      const data = await readFile(this.fileName, "utf8");
 
       if (data) return JSON.parse(data);
 
@@ -67,13 +68,13 @@ class Container {
 
   async deletById(id) {
     try {
-      const data = await fs.promises.readFile(this.fileName, "utf8");
+      const data = await readFile(this.fileName, "utf8");
 
       if (data) {
         const arrayData = JSON.parse(data);
         const filteredArray = arrayData.filter((x) => x.id !== id);
         const content = JSON.stringify(filteredArray);
-        await fs.promises.writeFile(this.fileName, content);
+        await writeFile(this.fileName, content);
       }
     } catch (error) {
       console.log(error);
@@ -82,35 +83,11 @@ class Container {
 
   async deleteAll() {
     try {
-      await fs.promises.unlink(this.fileName);
+      await unlink(this.fileName);
     } catch (error) {
       console.log(error);
     }
   }
 }
 
-
-module.exports = Container;
-
-// const container = new Container("products.txt");
-
-// const product = { title: "soap", proce: 10.33, thumbnails: "/##/##" };
-
-// container.save(product).then((id) => {
-//   console.log(id);
-//   container.save(product).then((id) => {
-//     console.log(id);
-//     container.getById(2).then((data) => {
-//       console.log(data);
-//       container.getAll().then((data) => {
-//         console.log(data);
-//         container.deletById(1).then(() => {
-//           container.getAll().then((data) => {
-//             console.log(data);
-//             container.deleteAll();
-//           });
-//         });
-//       });
-//     });
-//   });
-// });
+export default Container;
