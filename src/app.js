@@ -9,7 +9,7 @@ import { validateAdmin } from './middleware/middleware.js';
 const app = express();
 const port = 8080;
 
-app.listen(port, () => {
+app.listen(process.env.PORT || port, () => {
   console.log(`Example app listening on port ${port}`);
 });
 
