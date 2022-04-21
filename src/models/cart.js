@@ -1,10 +1,10 @@
 
 class Cart {
 
-  constructor(id, timestamp, produts = []){
+  constructor(id, products = []){
     this.id = parseInt(id);
-    this.timestamp = timestamp;
-    this.produts = produts;
+    this.timestamp = Date.now();
+    this.products = products;
   }
 }
 

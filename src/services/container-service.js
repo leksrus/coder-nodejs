@@ -14,9 +14,6 @@ class ContainerService {
       if (isExist) {
         const data = await readFile(this.fileName, "utf8");
         arrayData = JSON.parse(data);
-        const ids = arrayData.map((object) => object.id);
-        const max = Math.max(...ids);
-        object.id = max + 1;
         arrayData.push(object);
         const content = JSON.stringify(arrayData);
         await writeFile(this.fileName, content);
@@ -24,7 +21,6 @@ class ContainerService {
         return object.id;
       }
 
-      object.id = 1;
       arrayData.push(object);
       const content = JSON.stringify(arrayData);
       await writeFile(this.fileName, content);

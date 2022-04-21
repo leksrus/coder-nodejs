@@ -1,7 +1,7 @@
 class Product {
   constructor(id, name, description, code, price, stock, thumbnails) {
       this.id = parseInt(id);
-      this.timestamp = Date().now;
+      this.timestamp = Date.now();
       this.name = name;
       this.description = description;
       this.code = code;
