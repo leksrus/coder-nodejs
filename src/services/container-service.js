@@ -1,12 +1,12 @@
 import  { readFile, writeFile, unlink } from 'fs/promises';
 import { existsSync } from 'fs';
 
-class Container {
+class ContainerService {
   constructor(fileName) {
     this.fileName = fileName;
   }
 
-  async save(object) {
+  async saveNew(object) {
     try {
       const isExist = existsSync(this.fileName);
       let arrayData = [];
@@ -29,7 +29,30 @@ class Container {
       const content = JSON.stringify(arrayData);
       await writeFile(this.fileName, content);
 
-      return 1;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  
+  async saveUpdate(object) {
+    try {
+      const isExist = existsSync(this.fileName);
+      let arrayData = [];
+
+      if (isExist) {
+        const data = await readFile(this.fileName, "utf8");
+        arrayData = JSON.parse(data);
+        const products = arrayData.filter(x => x.id !== object.id);
+        products.push(object);
+        const content = JSON.stringify(products);
+        await writeFile(this.fileName, content);
+      
+        return true;
+      }
+
+      return false;
+
     } catch (error) {
       console.log(error);
     }
@@ -90,4 +113,4 @@ class Container {
   }
 }
 
-export default Container;
+export default ContainerService;

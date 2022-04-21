@@ -1,46 +1,71 @@
 import Product from '../models/product.js';
+import ContainerService from "../services/container-service.js"
+
+const containerService = new ContainerService("products.txt");
+
+export const getProducts = ( async (req, res) => {
+
+  const products = await containerService.getAll() || [];
+
+  const product = products.find(x => x.id === parseInt(req.params.id));
+
+  if(product) return res.status(200).json(product);
+
+  return res.status(200).json(products);
+
+});
 
 
+export const createProduct = ( async (req, res) => {
+  const id = await getId();
+  const product = new Product(id + 1, req.body.name, req.body.description, req.body.code, req.body.price, req.body.stock, req.body.thumbnails);
+  await containerService.saveNew(product);
 
- export const getProduct = ((req, res) => {
-  const id = Number(req.params.productID)
-  const product = products.find(product => product.id === id)
+  res.status(201).json(product);
+});
 
-      if (!product) {
-      return res.status(404).send('Product not found')
+export const updateProduct = ( async (req, res) => {
+  const products = await containerService.getAll() || [];
+  const product = products.find(x => x.id === parseInt(req.params.id));
+
+  if(product){
+    product.name = req.body.title;
+    product.description = req.body.description;
+    product.code = req.body.code;
+    product.price = req.body.price;
+    product.stock = req.body.stock;
+    product.thumbnails = req.body.thumbnails;
+
+    const isUpdateOk = await containerService.saveUpdate(product);
+
+    if(!isUpdateOk) return res.status(500).json(`Product update fail`);
+
+    return res.status(200).send("Product updated");
   }
-  res.json(product)
+
+  return res.status(404).json(`Product not found to update`);
+
 });
 
+export const deleteProduct = ( async (req, res) => {
+  const products = await containerService.getAll() || [];
+  const product = products.find(x => x.id === parseInt(req.params.id));
 
-export const createProduct = ((req, res) => {
-  const newProduct = {
-      id: products.length + 1,
-      name: req.body.name,
-      price: req.body.price
-  }
-  products.push(newProduct)
-  res.status(201).json(newProduct)
-});
+  if(product) {
+    await containerService.deletById(product.id);
 
-export const updateProduct = ((req, res) => {
-  const id = Number(req.params.productID)
-  const index = products.findIndex(product => product.id === id)
-  const updatedProduct = {
-      id: products[index].id,
-      name: req.body.name,
-      price: req.body.price
+    return res.status(200).send('Product deleted');
   }
 
-  products[index] = updatedProduct
-  res.status(200).json('Product updated')
+  return res.json({error: "404 product not found for delete"});
 });
 
-export const deleteProduct = ((req, res) => {
-  const id = Number(req.params.productID)
-  const index = products.findIndex(product => product.id === id)
-  products.splice(index,1)
-  res.status(200).json('Product deleted')
-});
+async function getId() {
+  const products = await containerService.getAll() || [];
+  const ids = products.map((product) => product.id);
 
-export default { getProduct, createProduct, updateProduct, deleteProduct };
+  return ids.length > 0 ? Math.max(...ids) : 0;
+}
+
+
+export default { getProducts, createProduct, updateProduct, deleteProduct };
