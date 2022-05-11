@@ -1,15 +1,22 @@
 import Cart from '../models/cart.js';
-import ContainerService from "../services/container-service.js"
+import FileContainer from "../continers/file-container.js"
+import CartMongoDao from "../daos/carts/cart-mongo.dao.js";
 
-const cartContainerService = new ContainerService("cart.txt");
+// const cartContainerService = new FileContainer("cart.txt");
 
 export const getCartProducts = ( async (req, res) => {
+  const cartMongoDao = new CartMongoDao();
+  // const cart = await cartContainerService.getById(parseInt(req.params.id));
 
-  const cart = await cartContainerService.getById(parseInt(req.params.id));
+  if(req.params.id) {
+    const cart = cartMongoDao.geCartByID(req.params.id);
 
-  if(cart) return res.status(200).json(cart.produts);
+    if(cart) return res.status(200).json(cart);
 
-  return res.status(404).send('Cart not found'); 
+    return res.status(404).send('Cart not found');
+  }
+
+  return res.status(400).send('Bad request');
 
 });
 
@@ -18,7 +25,7 @@ export const createCart = ( async (req, res) => {
   const id = await getId();
   const cart = new Cart(id + 1, []);
 
-  await cartContainerService.saveNew(cart);
+  await cartContainerService.save(cart);
 
   res.status(201).json({ message: 'Cart created', id: cart.id } );
 });
@@ -28,7 +35,7 @@ export const createCartProduct = ( async (req, res) => {
 
   if(cart) {
     cart.products = req.body.products;
-    await cartContainerService.saveUpdate(cart);
+    await cartContainerService.update(cart);
 
     return res.status(201).send('Product added');
   }
@@ -42,7 +49,7 @@ export const deleteCart = ( async (req, res) => {
   const cart = carts.find(x => x.id === parseInt(req.params.id));
 
   if(cart) {
-    await cartContainerService.deletById(cart.id);
+    await cartContainerService.deleteById(cart.id);
 
     return res.status(200).send('Cart deleted');
   }
@@ -56,7 +63,7 @@ export const deleteProductFromCart = ( async (req, res) => {
 
   if(cart) {
     cart.products = cart.products.filter(x => x.id !== parseInt(req.params.prod_id));
-    await cartContainerService.saveUpdate(cart);
+    await cartContainerService.update(cart);
 
     return res.status(200).send('Product deleted');
   }

@@ -22,8 +22,13 @@
     "ejs": "^3.1.6",
     "express": "^4.17.3",
     "express-handlebars": "^6.0.3",
+    "firebase": "^9.6.10",
+    "knex": "^2.0.0",
+    "mongoose": "^6.3.3",
+    "mysql2": "^2.3.3",
     "pug": "^3.0.2",
     "random": "^3.0.6",
-    "socket.io": "^4.4.1"
+    "socket.io": "^4.4.1",
+    "sqlite3": "^5.0.8"
   }
 }

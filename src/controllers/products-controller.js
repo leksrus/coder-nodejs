@@ -1,31 +1,37 @@
 import Product from '../models/product.js';
-import ContainerService from "../services/container-service.js"
+import FileContainer from "../continers/file-container.js"
+import ProductsMongoDao from '../daos/products/products-mongo.dao.js'
 
-const productContainerService = new ContainerService("products.txt");
+// const productContainerService = new FileContainer("products.txt");
 
 export const getProducts = ( async (req, res) => {
 
-  const products = await productContainerService.getAll() || [];
+    const productDao = new ProductsMongoDao();
 
-  const product = products.find(x => x.id === parseInt(req.params.id));
+    if(req.params.id) {
+      const product = await productDao.getProductByID(req.params.id)
 
-  if(product) return res.status(200).json(product);
+      return res.status(200).json(product);
+    }
 
-  return res.status(200).json(products);
+    const products = await productDao.getAllProducts();
 
+    return res.status(200).json(products);
 });
 
 
 export const createProduct = ( async (req, res) => {
   const id = await getId();
   const product = new Product(id + 1, req.body.name, req.body.description, req.body.code, req.body.price, req.body.stock, req.body.thumbnails);
-  await productContainerService.saveNew(product);
+  const productDao = new ProductsMongoDao();
+  const savedProduct = await productDao.saveProduct(product);
 
-  res.status(201).json(product);
+  res.status(201).json(savedProduct);
 });
 
 export const updateProduct = ( async (req, res) => {
-  const products = await productContainerService.getAll() || [];
+  // const products = await productContainerService.getAll() || [];
+  const productDao = new ProductsMongoDao();
   const product = products.find(x => x.id === parseInt(req.params.id));
 
   if(product){
@@ -36,7 +42,7 @@ export const updateProduct = ( async (req, res) => {
     product.stock = req.body.stock;
     product.thumbnails = req.body.thumbnails;
 
-    const isUpdateOk = await productContainerService.saveUpdate(product);
+    const isUpdateOk = await productContainerService.update(product);
 
     if(!isUpdateOk) return res.status(500).send(`Product update fail`);
 
@@ -52,7 +58,7 @@ export const deleteProduct = ( async (req, res) => {
   const product = products.find(x => x.id === parseInt(req.params.id));
 
   if(product) {
-    await productContainerService.deletById(product.id);
+    await productContainerService.deleteById(product.id);
 
     return res.status(200).send('Product deleted');
   }
