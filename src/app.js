@@ -5,13 +5,17 @@ import { validateAdmin } from './middleware/middleware.js';
 import {mongooseCon} from "./config/configurations.js";
 
 
+
 await mongooseCon();
 
 const app = express();
 const port = 8080;
 
+process.env.DAO = 'firebase';
+
 app.listen(process.env.PORT || port, () => {
   console.log(`Example app listening on port ${port}`);
+  console.log(process.env.DAO);
 });
 
 

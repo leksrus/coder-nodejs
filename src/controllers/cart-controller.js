@@ -1,15 +1,14 @@
 import Cart from '../models/cart.js';
-import FileContainer from "../continers/file-container.js"
-import CartMongoDao from "../daos/carts/cart-mongo.dao.js";
 
-// const cartContainerService = new FileContainer("cart.txt");
+const pathMongoDao = '../daos/products/products-mongo.dao.js';
+const pathFirebaseDao = '../daos/products/product-firebase.dao.js';
+const module = process.env.DAO === 'firebase' ? await import(pathFirebaseDao) :  await import(pathMongoDao);
 
 export const getCartProducts = ( async (req, res) => {
-  const cartMongoDao = new CartMongoDao();
-  // const cart = await cartContainerService.getById(parseInt(req.params.id));
+  const cartDao = new module.default();
 
   if(req.params.id) {
-    const cart = cartMongoDao.geCartByID(req.params.id);
+    const cart = cartDao.geCartByID(req.params.id);
 
     if(cart) return res.status(200).json(cart);
 
@@ -22,12 +21,16 @@ export const getCartProducts = ( async (req, res) => {
 
 
 export const createCart = ( async (req, res) => {
-  const id = await getId();
-  const cart = new Cart(id + 1, []);
+  const cartDao = new module.default();
+  const cart = new Cart(0, req.body.products);
 
-  await cartContainerService.save(cart);
+  if(req.params.id) {
+    await cartDao.updateProductById(req.params.id, cart);
 
-  res.status(201).json({ message: 'Cart created', id: cart.id } );
+    return res.status(201).json({ message: 'Cart created', id: cart.id } );
+  }
+
+  return res.status(400).send(`Bad request`);
 });
 
 export const createCartProduct = ( async (req, res) => {
@@ -45,16 +48,15 @@ export const createCartProduct = ( async (req, res) => {
 
 
 export const deleteCart = ( async (req, res) => {
-  const carts = await cartContainerService.getAll() || [];
-  const cart = carts.find(x => x.id === parseInt(req.params.id));
+  const cartDao = new module.default();
 
-  if(cart) {
-    await cartContainerService.deleteById(cart.id);
+  if(req.params.id) {
+    await cartDao.deleteProductById(req.params.id);
 
-    return res.status(200).send('Cart deleted');
+    return res.status(201).json({ message: 'Cart created' } );
   }
 
-  return res.status(404).send('Cart not found for delete'); 
+  return res.status(400).send(`Bad request`);
 });
 
 export const deleteProductFromCart = ( async (req, res) => {
@@ -70,13 +72,6 @@ export const deleteProductFromCart = ( async (req, res) => {
 
   return res.status(404).send('Product not found for delete'); 
 });
-
-async function getId() {
-  const carts = await cartContainerService.getAll() || [];
-  const ids = carts.map((cart) => cart.id);
-
-  return ids.length > 0 ? Math.max(...ids) : 0;
-}
 
 
 export default { getCartProducts, createCart, createCartProduct, deleteCart, deleteProductFromCart };
