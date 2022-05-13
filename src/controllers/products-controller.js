@@ -2,9 +2,9 @@ import Product from '../models/product.js';
 
 const pathMongoDao = '../daos/products/products-mongo.dao.js';
 const pathFirebaseDao = '../daos/products/product-firebase.dao.js';
-const module = process.env.DAO === 'firebase' ? await import(pathFirebaseDao) :  await import(pathMongoDao);
 
 export const getProducts = ( async (req, res) => {
+    const module = process.env.DAO === 'firebase' ? await import(pathFirebaseDao) :  await import(pathMongoDao);
     const productDao = new module.default();
     if(req.params.id) {
       const product = await productDao.getProductByID(req.params.id)
@@ -20,6 +20,7 @@ export const getProducts = ( async (req, res) => {
 
 export const createProduct = ( async (req, res) => {
   const product = new Product(0, req.body.name, req.body.description, req.body.code, req.body.price, req.body.stock, req.body.thumbnails);
+    const module = process.env.DAO === 'firebase' ? await import(pathFirebaseDao) :  await import(pathMongoDao);
   const productDao = new module.default();
   await productDao.saveProduct(product);
 
@@ -28,6 +29,7 @@ export const createProduct = ( async (req, res) => {
 
 export const updateProduct = ( async (req, res) => {
   const product = new Product(0, req.body.name, req.body.description, req.body.code, req.body.price, req.body.stock, req.body.thumbnails);
+    const module = process.env.DAO === 'firebase' ? await import(pathFirebaseDao) :  await import(pathMongoDao);
   const productDao = new module.default();
 
   if(req.params.id) {
@@ -41,6 +43,7 @@ export const updateProduct = ( async (req, res) => {
 });
 
 export const deleteProduct = ( async (req, res) => {
+    const module = process.env.DAO === 'firebase' ? await import(pathFirebaseDao) :  await import(pathMongoDao);
     const productDao = new module.default();
 
   if(req.params.id) {

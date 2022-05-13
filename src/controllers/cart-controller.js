@@ -2,9 +2,9 @@ import Cart from '../models/cart.js';
 
 const pathMongoDao = '../daos/products/products-mongo.dao.js';
 const pathFirebaseDao = '../daos/products/product-firebase.dao.js';
-const module = process.env.DAO === 'firebase' ? await import(pathFirebaseDao) :  await import(pathMongoDao);
 
 export const getCartProducts = ( async (req, res) => {
+  const module = process.env.DAO === 'firebase' ? await import(pathFirebaseDao) :  await import(pathMongoDao);
   const cartDao = new module.default();
 
   if(req.params.id) {
@@ -21,6 +21,7 @@ export const getCartProducts = ( async (req, res) => {
 
 
 export const createCart = ( async (req, res) => {
+  const module = process.env.DAO === 'firebase' ? await import(pathFirebaseDao) :  await import(pathMongoDao);
   const cartDao = new module.default();
   const cart = new Cart(0, req.body.products);
 
@@ -48,6 +49,7 @@ export const createCartProduct = ( async (req, res) => {
 
 
 export const deleteCart = ( async (req, res) => {
+  const module = process.env.DAO === 'firebase' ? await import(pathFirebaseDao) :  await import(pathMongoDao);
   const cartDao = new module.default();
 
   if(req.params.id) {
