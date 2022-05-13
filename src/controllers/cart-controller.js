@@ -35,16 +35,17 @@ export const createCart = ( async (req, res) => {
 });
 
 export const createCartProduct = ( async (req, res) => {
-  const cart = await cartContainerService.getById(parseInt(req.params.id));
+  const module = process.env.DAO === 'firebase' ? await import(pathFirebaseDao) :  await import(pathMongoDao);
+  const cartDao = new module.default();
+  const cart = new Cart(0, req.body.products);
 
-  if(cart) {
-    cart.products = req.body.products;
-    await cartContainerService.update(cart);
+  if(req.params.id) {
+    await cartDao.updateProductById(req.params.id, cart);
 
-    return res.status(201).send('Product added');
+    return res.status(201).json({ message: 'Cart created' } );
   }
 
-  return res.status(404).send('Cart not found'); 
+  return res.status(400).send('Bad request');
 });
 
 
@@ -55,24 +56,24 @@ export const deleteCart = ( async (req, res) => {
   if(req.params.id) {
     await cartDao.deleteProductById(req.params.id);
 
-    return res.status(201).json({ message: 'Cart created' } );
+    return res.status(201).json({ message: 'Cart deleted' } );
   }
 
   return res.status(400).send(`Bad request`);
 });
 
 export const deleteProductFromCart = ( async (req, res) => {
-  const carts = await cartContainerService.getAll() || [];
-  const cart = carts.find(x => x.id === parseInt(req.params.id));
+  const module = process.env.DAO === 'firebase' ? await import(pathFirebaseDao) :  await import(pathMongoDao);
+  const cartDao = new module.default();
+  const cart = new Cart(0, req.body.products);
 
-  if(cart) {
-    cart.products = cart.products.filter(x => x.id !== parseInt(req.params.prod_id));
-    await cartContainerService.update(cart);
+  if(req.params.id) {
+    await cartDao.updateProductById(req.params.id, cart);
 
-    return res.status(200).send('Product deleted');
+    return res.status(201).json({ message: 'Product delete from cart' } );
   }
 
-  return res.status(404).send('Product not found for delete'); 
+  return res.status(400).send('Bad request');
 });
 
 
