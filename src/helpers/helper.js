@@ -1,4 +1,5 @@
 import {Storage} from '@google-cloud/storage';
+import nodemailer from 'nodemailer';
 import {format} from 'util';
 
 const storage = new Storage({
@@ -25,4 +26,22 @@ export const uploadImage = (file) => new Promise((resolve, reject) => {
         })
         .end(buffer);
 });
+
+export const sendEmail = async (email) => {
+    const transporter = nodemailer.createTransport({
+        host: 'smtp.ethereal.email',
+        port: 587,
+        auth: {
+            user: process.env.MAILUSER,
+            pass: process.env.MAILPASS
+        }
+    });
+
+     await transporter.sendMail({
+        from: 'Site Admin',
+        to: process.env.MAILUSER,
+        subject: "New user register",
+        html: `<b>New account created email: ${email}</b>`,
+    });
+}
 

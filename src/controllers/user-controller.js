@@ -1,7 +1,7 @@
 import User from "../models/user.js";
 import bcrypt  from 'bcrypt';
 import UsersMongoDao from "../daos/products/users-mongo.dao.js";
-import {uploadImage} from "../helpers/helper.js";
+import {sendEmail, uploadImage} from "../helpers/helper.js";
 
 export const createUser = ( async (req, res) => {
     const salt = await bcrypt.genSalt(10);
@@ -12,6 +12,7 @@ export const createUser = ( async (req, res) => {
     const userDao = new UsersMongoDao();
 
     await userDao.saveUser(user);
+    await sendEmail(user.email);
 
     return res.status(200).json({user: user, message: 'User created'});
 
