@@ -2,7 +2,7 @@
 
 export const validateAdmin = ((req, res, next) => {
 
-  if(req.method !== 'GET' && !req.path.toLowerCase().includes('cart')){
+  if(req.method !== 'GET'  && !req.path.toLowerCase().includes('cart') && !req.path.toLowerCase().includes('users')){
     const isAdmin = (req.body.isAdmin?.toLowerCase() === 'true');
 
     console.log(req.path);
