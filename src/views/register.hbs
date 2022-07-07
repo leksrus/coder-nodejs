@@ -1,0 +1,49 @@
+
+<div class="container">
+    <div class="row mt-5">
+        <div class="col offset-md-11">
+            <a class="btn btn-secondary" href="/api/users/login" role="button">Login</a>
+        </div>
+    </div>
+    <div class="col-12 mt-5">
+        <form action="/api/users/register" method="POST">
+            <div class="form-group">
+                <label for="username">User name</label>
+                <input type="email" name="username" id="username" class="form-control my-2 mr-2" placeholder="User Name">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" name="password" id="password" class="form-control my-2 mr-2" placeholder="Password">
+            </div>
+            <div class="form-group">
+                <label for="firstname">Firstname</label>
+                <input type="text" name="firstname" id="firstname" class="form-control my-2 mr-2" placeholder="Firstname">
+            </div>
+            <div class="form-group">
+                <label for="lastname">Lastname</label>
+                <input type="text" name="lastname" id="lastname" class="form-control my-2 mr-2" placeholder="Lastname">
+            </div>
+            <div class="form-group">
+                <label for="address">Address</label>
+                <input type="text" name="address" id="address" class="form-control my-2 mr-2" placeholder="Address">
+            </div>
+            <div class="form-group">
+                <label for="address">Address</label>
+                <input type="text" name="address" id="address" class="form-control my-2 mr-2" placeholder="Address">
+            </div>
+            <div class="form-group">
+                <label for="age">Age</label>
+                <input type="number" name="age" id="age" class="form-control my-2 mr-2" placeholder="Age">
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone</label>
+                <input type="tel" name="phone" id="phone" class="form-control my-2 mr-2" placeholder="Phone">
+            </div>
+            <div class="form-group">
+                <label for="photo">Photo</label>
+                <input type="file" name="photo" id="photo" class="form-control my-2 mr-2" placeholder="Photo">
+            </div>
+            <input class="btn btn-primary my-2" type="submit" value="Register">
+        </form>
+    </div>
+</div>
