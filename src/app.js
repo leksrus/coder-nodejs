@@ -13,6 +13,7 @@ import { engine } from 'express-handlebars';
 import passport from "passport";
 import session from 'express-session';
 import MongoStore from 'connect-mongo';
+import {orderRouter} from "./routers/order-router.js";
 
 
 const totalCpus = os.cpus().length;
@@ -97,6 +98,7 @@ if (cluster.isMaster && enableCluster) {
   app.use('/api/products', productRouter);
   app.use('/api/cart', cartRouter);
   app.use('/api/users', userRouter);
+  app.use('/api/orders', orderRouter);
 
 
   app.use((req, res, next) => {

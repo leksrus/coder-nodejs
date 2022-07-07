@@ -1,6 +1,7 @@
 import {Storage} from '@google-cloud/storage';
 import nodemailer from 'nodemailer';
 import {format} from 'util';
+import twilio from 'twilio';
 
 const storage = new Storage({
 keyFilename: 'tech-market-bad6f-firebase-adminsdk-upnfm-0321b83bea.json'
@@ -47,3 +48,13 @@ export const sendEmail = async (data) => {
     });
 }
 
+
+export const sendSms = async (data) => {
+    const client = twilio(process.env.TWILIOACCOUNT, process.env.TWILIOTOKEN);
+
+    await client.messages.create({
+        body: data.body,
+        from: '+12514283970',
+        to: data.phone
+    });
+}
