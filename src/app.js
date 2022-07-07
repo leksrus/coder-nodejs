@@ -8,6 +8,11 @@ import {mongooseCon} from "./config/configurations.js";
 import {userRouter} from "./routers/user-router.js";
 import cluster from 'cluster';
 import os from 'os';
+import log4js from 'log4js';
+import { engine } from 'express-handlebars';
+import passport from "passport";
+import session from 'express-session';
+import MongoStore from 'connect-mongo';
 
 
 const totalCpus = os.cpus().length;
@@ -27,9 +32,44 @@ if (cluster.isMaster && enableCluster) {
   });
 } else {
 
+  log4js.configure({
+    appenders : {
+      console: { type: 'console'},
+      fileError: {type: 'file', filename: 'error.log'},
+      fileWarning: {type: 'file', filename: 'warn.log'}
+    },
+    categories: {
+      error: { appenders: ['fileError'], level: 'error' },
+      warning: { appenders: ['fileWarning'], level: 'warn'},
+      default: { appenders: ['console'], level: 'debug'}
+    }
+  });
+
+
   await mongooseCon();
 
   const app = express();
+
+  app.engine(
+      "hbs",
+      engine({
+        extname: ".hbs",
+        defaultLayout: 'index.hbs',
+      })
+  );
+
+  app.set('views', './src/views');
+  app.set('view engine', 'hbs');
+
+  app.use(session({
+    store: MongoStore.create({ mongoUrl: process.env.MONGOSESSIONURL }),
+    secret: process.env.SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      maxAge: 1000 * 60 * 10
+    }
+  }));
 
   const multerMid = multer({
     storage: multer.memoryStorage(),
@@ -52,8 +92,22 @@ if (cluster.isMaster && enableCluster) {
   app.use(express.json());
   app.use(express.urlencoded({extended: true}));
   app.use(validateAdmin);
+  app.use(passport.initialize());
+  app.use(passport.session());
   app.use('/api/products', productRouter);
   app.use('/api/cart', cartRouter);
   app.use('/api/users', userRouter);
 
+
+  app.use((req, res, next) => {
+    const logger = log4js.getLogger('warning');
+    logger.warn('Route not found');
+    return res.status(404).send({ message: 'Route'+req.url+' Not found.' });
+  });
+
+  app.use((err, req, res, next) => {
+    const logger = log4js.getLogger('error');
+    logger.warn('Errors generic');
+    return res.status(500).send({ error: err });
+  });
 }

@@ -14,10 +14,12 @@ export const uploadImage = (file) => new Promise((resolve, reject) => {
     const blobStream = blob.createWriteStream({
         resumable: false
     });
-    blobStream.on('finish', () => {
-        const publicUrl = format(
-            `https://storage.googleapis.com/${bucket.name}/${blob.name}`
-        );
+    blobStream.on('finish', async () => {
+        const url = await blob.getSignedUrl({
+            action: 'read',
+            expires: '03-09-2491'
+        });
+        const publicUrl = format(url[0]);
         resolve(publicUrl);
     })
         .on('error', (err) => {
@@ -27,7 +29,7 @@ export const uploadImage = (file) => new Promise((resolve, reject) => {
         .end(buffer);
 });
 
-export const sendEmail = async (email) => {
+export const sendEmail = async (data) => {
     const transporter = nodemailer.createTransport({
         host: 'smtp.ethereal.email',
         port: 587,
@@ -40,8 +42,8 @@ export const sendEmail = async (email) => {
      await transporter.sendMail({
         from: 'Site Admin',
         to: process.env.MAILUSER,
-        subject: "New user register",
-        html: `<b>New account created email: ${email}</b>`,
+        subject: data.subject,
+        html: data.message,
     });
 }
 
