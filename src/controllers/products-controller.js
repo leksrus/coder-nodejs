@@ -1,18 +1,16 @@
 import Product from '../models/product.js';
+import ProductService from "../services/product-service.js";
 
-const pathMongoDao = '../daos/products/products-mongo.dao.js';
-const pathFirebaseDao = '../daos/products/product-firebase.dao.js';
+const productService = new ProductService();
 
 export const getProducts = ( async (req, res) => {
-    const module = process.env.DAO === 'firebase' ? await import(pathFirebaseDao) :  await import(pathMongoDao);
-    const productDao = new module.default();
     if(req.params.id) {
-      const product = await productDao.getProductByID(req.params.id)
+      const product = await productService.getProductById(req.params.id)
 
       return res.status(200).json(product);
     }
 
-    const products = await productDao.getAllProducts();
+    const products = await productService.getAllProducts();
 
     return res.status(200).json(products);
 });
@@ -20,20 +18,16 @@ export const getProducts = ( async (req, res) => {
 
 export const createProduct = ( async (req, res) => {
   const product = new Product(0, req.body.name, req.body.description, req.body.code, req.body.price, req.body.stock, req.body.thumbnails);
-    const module = process.env.DAO === 'firebase' ? await import(pathFirebaseDao) :  await import(pathMongoDao);
-  const productDao = new module.default();
-  await productDao.saveProduct(product);
+  await productService.createProduct(product);
 
   res.status(201).send(`Product saved`);
 });
 
 export const updateProduct = ( async (req, res) => {
   const product = new Product(0, req.body.name, req.body.description, req.body.code, req.body.price, req.body.stock, req.body.thumbnails);
-    const module = process.env.DAO === 'firebase' ? await import(pathFirebaseDao) :  await import(pathMongoDao);
-  const productDao = new module.default();
 
   if(req.params.id) {
-    await productDao.updateProductById(req.params.id, product);
+    await productService.modifyProductById(req.params.id, product);
 
     return res.status(200).send(`Product updated`);
   }
@@ -43,11 +37,9 @@ export const updateProduct = ( async (req, res) => {
 });
 
 export const deleteProduct = ( async (req, res) => {
-    const module = process.env.DAO === 'firebase' ? await import(pathFirebaseDao) :  await import(pathMongoDao);
-    const productDao = new module.default();
 
   if(req.params.id) {
-    await productDao.deleteProductById(req.params.id);
+    await productService.deleteProductById(req.params.id);
 
     return res.status(200).send(`Product updated`);
   }

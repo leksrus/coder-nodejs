@@ -29,7 +29,7 @@ class CartMongoDao extends MongoContainer {
         return this.getAll(this.model);
     }
 
-    async geCartByID(id) {
+    async getCartByID(id) {
         return this.getById(id, this.model);
     }
 
