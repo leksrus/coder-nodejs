@@ -1,26 +1,11 @@
-import {OrderMongoDao} from "../daos/orders/order-mongo.dao.js";
-import {sendEmail, sendSms} from "../helpers/helper.js";
 import Order from "../models/order.js";
+import OrderService from "../services/order-service.js";
 
+const orderService = new OrderService();
 
 export const createOrder = ( async (req, res) => {
-    const orderMongoDao = new OrderMongoDao();
-
-    const newOrder = new Order(req.body.cart, req.body.user);
-
-    await orderMongoDao.saveOrder(newOrder);
-
-
-        await sendSms({
-            body: 'Dear customer, thanks for buying in techno-market',
-            phone: newOrder.user.phone
-        });
-
-        await sendEmail({
-            subject: 'New order register',
-            message: `<b>New order created -> products: ${JSON.stringify(newOrder.cart.products) }</b>`
-        })
-
+    const order = new Order(req.body.cart, req.body.user);
+    await orderService.createOrder(order);
 
     return res.status(200).json({message: 'Order created'});
 

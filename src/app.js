@@ -4,7 +4,6 @@ import multer from 'multer';
 import {productRouter} from './routers/products-routes.js';
 import {cartRouter} from './routers/cart-router.js';
 import { validateAdmin } from './middleware/middleware.js';
-import {mongooseCon} from "./config/configurations.js";
 import {userRouter} from "./routers/user-router.js";
 import cluster from 'cluster';
 import os from 'os';
@@ -47,9 +46,7 @@ if (cluster.isMaster && enableCluster) {
   });
 
 
-  await mongooseCon();
-
-  const app = express();
+ const app = express();
 
   app.engine(
       "hbs",
