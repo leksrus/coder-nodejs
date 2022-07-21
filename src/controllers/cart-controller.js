@@ -15,17 +15,14 @@ export const getCartProducts = ( async (req, res) => {
 
 });
 
-
 export const createCart = ( async (req, res) => {
   const cart = new Cart(0, req.body.products);
 
-  if(req.params.id) {
-    await cartService.modifyCartById(req.params.id, cart);
+    const newCart = await cartService.createCart(cart);
 
-    return res.status(201).json({ message: 'Cart created', id: cart.id } );
-  }
+    if(newCart)  return res.status(201).json({ message: 'Cart created', newCart } );
 
-  return res.status(400).send(`Bad request`);
+    return res.status(400).json({ message: 'Bad request' } );
 });
 
 export const createCartProduct = ( async (req, res) => {

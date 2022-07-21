@@ -1,28 +1,28 @@
-import CartMongoDao from "../daos/carts/cart-mongo.dao.js";
+import CartRepository from "../repositories/cart.repository.js";
 
 class CartService {
     constructor() {
-        this.cartMongoDao = new CartMongoDao();
+        this.cartRepository = new CartRepository();
     }
 
     async createCart(cart) {
-        return this.cartMongoDao.saveCart(cart);
+        return this.cartRepository.add(cart);
     }
 
     async getAllCarts() {
-        return this.cartMongoDao.getAllCarts();
+        return this.cartRepository.getAll();
     }
 
     async getCartById(id) {
-        return this.cartMongoDao.getCartByID(id);
+        return this.cartRepository.getById(id);
     }
 
     async modifyCartById(id, cart) {
-        return this.cartMongoDao.updateCartById(id, cart);
+        return this.cartRepository.update(id, cart);
     }
 
     async deleteCartById(id){
-        return this.deleteCartById(id);
+        return this.cartRepository.removeById(id);
     }
 }
 

@@ -1,42 +1,57 @@
-import FirebaseContainer from "../../continers/firebase-container.js";
+import {initializeApp} from "firebase/app";
+import {collection, getFirestore, doc, getDoc, getDocs, addDoc, setDoc, deleteDoc } from "firebase/firestore/lite";
 
 
-class CartFirebaseDao extends FirebaseContainer{
+class CartFirebaseDao {
+
+    init() {
+        const firebaseConfig = {
+            apiKey: "AIzaSyBFLmN0nu3_lRIiZdyTXItCF5SpZm_IFbE",
+            authDomain: "tech-market-bad6f.firebaseapp.com",
+            projectId: "tech-market-bad6f",
+            storageBucket: "tech-market-bad6f.appspot.com",
+            messagingSenderId: "298042791231",
+            appId: "1:298042791231:web:6489e41392983a8f79af8a",
+            measurementId: "G-V186TXRKVV"
+        };
+
+        this.firebaseApp = initializeApp(firebaseConfig);
+    }
+
     async saveProduct(product) {
-        await this.save({
-            timestamp: product.timestamp,
-            name: product.name,
-            description: product.description,
-            code:  product.code,
-            price: product.price,
-            stock:  product.stock,
-            thumbnails: product.thumbnails
-        }, 'carts');
+        const db = getFirestore(this.firebaseApp);
+        const collectionData = collection(db, product);
+
+        return addDoc(collectionData, 'carts');
     }
 
     async getAllProducts() {
-        return this.getAll('carts');
+        const db = getFirestore(this.firebaseApp);
+        const collectionData = collection(db, 'carts');
+        const dataSnapshot = await getDocs(collectionData);
+
+        return dataSnapshot.docs.map(x => ({id: x.id, ...x.data() }));
     }
 
     async getProductByID(id) {
-        return this.getById(id, 'carts');
+        const db = getFirestore(this.firebaseApp);
+        const docData = doc(db, 'carts', id);
+        const dataSnapshot = await getDoc(docData);
+
+        return Object.assign({id: dataSnapshot.id}, dataSnapshot.data());
     }
 
     async updateProductById(id, product) {
-        return this.update({
-            timestamp: product.timestamp,
-            name: product.name,
-            description: product.description,
-            code:  product.code,
-            price: product.price,
-            stock:  product.stock,
-            thumbnails: product.thumbnails
-        }, 'carts', id);
+        const db = getFirestore(this.firebaseApp);
+        const docData = doc(db, 'carts', id);
 
+       return  setDoc(docData, product);
     }
 
     async deleteProductById(id) {
-        return this.deleteById(id, 'carts');
+        const db = getFirestore(this.firebaseApp);
+        const docData = doc(db, 'carts', id);
+        return deleteDoc(docData);
     }
 }
 

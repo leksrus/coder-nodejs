@@ -1,58 +1,47 @@
-import MongoContainer from "../../continers/mongo-container.js";
 import mongoose from "mongoose";
+import {asCartDto} from "../../dtos/cart.dto.js";
 
 
-class CartMongoDao extends MongoContainer {
+class CartMongoDao {
     constructor() {
-        super();
-        this.model = mongoose.model('cart', this.getCartSchema());
+        this.cart = mongoose.model('cart', this.getCartSchema());
     }
 
-    async saveCart(cart) {
-        await this.save({
-            timestamp: cart.timestamp,
-            products: cart.products.map(x => {
-                return {
-                    timestamp: x.timestamp,
-                    name: x.name,
-                    description: x.description,
-                    code:  x.code,
-                    price: x.price,
-                    stock:  x.stock,
-                    thumbnails: x.thumbnails
-                }
-            })
-        }, this.model);
+    init(){
+        mongoose.connect('mongodb+srv://test:NMZQbTCltcIhpUa3@cluster0.zxw9v.mongodb.net/techno-market?retryWrites=true&w=majority')
+            .then(() => console.log('Mongo connected'))
+            .catch(err => console.log(err));
+    }
+
+    async createCart(cart) {
+        const newCart = await this.cart.create(cart);
+
+        return asCartDto(newCart);
     }
 
     async getAllCarts() {
-        return this.getAll(this.model);
+        const carts = await this.cart.find({});
+
+        return asCartDto(carts);
     }
 
     async getCartByID(id) {
-        return this.getById(id, this.model);
+        const cart = await this.cart.findOne({_id: id});
+
+        return asCartDto(cart);
     }
 
     async updateCartById(id, cart) {
-        return this.update({
-            timestamp: cart.timestamp,
-            products: cart.products.map(x => {
-                return {
-                    timestamp: x.timestamp,
-                    name: x.name,
-                    description: x.description,
-                    code:  x.code,
-                    price: x.price,
-                    stock:  x.stock,
-                    thumbnails: x.thumbnails
-                }
-            })
-        }, this.model, id);
+        const newCart = await  this.cart.findOneAndUpdate({_id: id}, {$set: cart});
+
+        return asCartDto(newCart);
 
     }
 
     async deleteCartById(id) {
-        return this.deleteById(id, this.model);
+        const cart = await this.cart.findOneAndDelete({_id: id});
+
+        return asCartDto(cart);
     }
 
     getCartSchema() {
