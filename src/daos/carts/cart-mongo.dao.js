@@ -26,8 +26,7 @@ class CartMongoDao {
     }
 
     async getCartByID(id) {
-        const cart = await this.cart.findOne({_id: id});
-
+        const cart = await this.cart.findById(id);
         return asCartDto(cart);
     }
 

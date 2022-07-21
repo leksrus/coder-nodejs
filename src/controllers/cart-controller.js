@@ -4,7 +4,7 @@ const cartService = new CartService();
 
 export const getCartProducts = ( async (req, res) => {
   if(req.params.id) {
-    const cart = cartService.getCartById(req.params.id);
+    const cart = await cartService.getCartById(req.params.id);
 
     if(cart) return res.status(200).json(cart);
 
